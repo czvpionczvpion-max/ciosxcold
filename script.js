@@ -130,3 +130,39 @@
     raf = requestAnimationFrame(frame);
   }
 })();
+
+(() => {
+  const buttons = document.querySelectorAll("[data-copy]");
+  if (!buttons.length) return;
+
+  async function copyCode(btn) {
+    const code = btn.getAttribute("data-copy");
+    if (!code) return;
+
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = code;
+      input.setAttribute("readonly", "");
+      input.style.position = "absolute";
+      input.style.left = "-9999px";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+    }
+
+    const prev = btn.textContent;
+    btn.textContent = "Skopiowano";
+    btn.classList.add("is-copied");
+    window.setTimeout(() => {
+      btn.textContent = prev;
+      btn.classList.remove("is-copied");
+    }, 1800);
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => copyCode(btn));
+  });
+})();
